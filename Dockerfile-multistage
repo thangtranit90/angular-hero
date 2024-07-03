@@ -1,0 +1,21 @@
+FROM node:13-alpine as buildstep
+
+WORKDIR /app
+
+COPY ./angular-hero/package.json .
+
+RUN npm install
+
+COPY ./angular-hero .
+
+RUN npm run build
+
+# Stage 2
+
+FROM nginx:1.17-alpine
+
+COPY --from=buildstep /app/dist/ /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
